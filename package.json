@@ -1,0 +1,53 @@
+{
+  "name": "dsh-artifact-wall",
+  "version": "0.1.1",
+  "description": "会话产物面板：每轮对话末尾列出本轮产物文件（可点击侧边栏预览、可右键菜单），并在会话底部提供「查看所有产物」入口，打开右侧栏的产物总列表",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "artifacts",
+    "deliverables"
+  ],
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0",
+    "node": ">=20"
+  },
+  "author": "dsh-artifact-wall contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HuangQinHao/dsh-artifact-wall.git"
+  },
+  "homepage": "https://github.com/HuangQinHao/dsh-artifact-wall#readme",
+  "bugs": {
+    "url": "https://github.com/HuangQinHao/dsh-artifact-wall/issues"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "license": "MIT"
+}
