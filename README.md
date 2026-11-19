@@ -38,13 +38,44 @@
 
 ## 安装
 
-已在 desktop profile 安装（`dsh.profile.bundles` 含 `dsh-artifact-wall`）。重装/给别的 profile 装：
+**从 npm 安装（推荐，换机器/换 profile 一致）**
+
+```
+plugin_manager install_bundle("dsh-artifact-wall@0.1.1")
+```
+
+不写版本号则取 `latest`：
+
+```
+plugin_manager install_bundle("dsh-artifact-wall")
+```
+
+**从本地源码目录安装（开发调试用）**
 
 ```
 plugin_manager install_bundle("D:\\工作\\22.Harness\\dsh-plugins\\dsh-artifact-wall")
 ```
 
-装完**刷新页面**（Ctrl+R）即可，不需要重启 app。`node_modules/dsh-artifact-wall` 与源目录是同一份文件，改源码后刷新页面就生效。
+两种方式装完都**刷新页面**（Ctrl+R）即可，不需要重启 app。本地目录方式下 `node_modules/dsh-artifact-wall` 是指向源目录的 junction，改源码刷新即生效；npm 方式是真实拷贝，改源码要重新安装。
+
+## 发布
+
+| 项 | 值 |
+| --- | --- |
+| npm 包 | `dsh-artifact-wall` |
+| 当前版本 | `0.1.1`（2026-11-19 发布） |
+| registry | `https://registry.npmjs.org/dsh-artifact-wall` |
+| 仓库 | https://github.com/HuangQinHao/dsh-artifact-wall （MIT） |
+| 引擎约束 | `engines.dsh = ">=0.2.2-rc.1 <0.3.0-0"` |
+
+发布流程（本机没有 npm CLI，用自写脚本直连 registry 的 HTTP API）：
+
+```
+python D:\\工作\\22.Harness\\脚本\\pack_dsh_plugin.py <插件目录>
+set NPM_TOKEN=... & python D:\\工作\\22.Harness\\脚本\\publish_dsh_plugin.py <插件目录>
+```
+
+npm 对**全新包的首发**会先建一个 `0.0.0-stage` 占位版本（原文：*Temporary package placeholder for staged publishing*），约两分钟后真实版本落位、`latest` 指向 `0.1.1`。这个占位会永久留在 versions 列表里，但不影响安装——`npm i dsh-artifact-wall` 取的是 `latest`。
 
 ## 启用 / 停用
 
@@ -106,3 +137,5 @@ plugin_manager install_bundle("D:\\工作\\22.Harness\\dsh-plugins\\dsh-artifact
 - 2026-11-19：`Slots.listSubTree("conversation.chat.turnTail")` → occupants 含 `{id:"dsh-artifact-wall", order:60, active:true}`；`Slots.listSubTree("sidebar.right.pane.tab")` → occupants 含 `{key:"dsh-artifact-wall", active:true}`；页面 console 无本插件报错。
 - 2026-11-19：`node --check` 通过（client.js / index.js）。界面视觉验收（卡片渲染、点击预览、右键、面板）按上文步骤执行。
 - 2026-11-19：0.1.1 实测。MRP 会话（末尾轮被停止、整段无 write 产物）末尾出现淡色「查看所有产物 ›」；点击 → 右侧「产物 0」+ 口径说明文案。本会话有产物的轮次显示「查看所有产物（7）」+ 卡片，点行预览成功。
+- 2026-11-19：发布到 npm。`PUT /dsh-artifact-wall` → HTTP 202（registry 先建 `0.0.0-stage` 占位），2 分钟后 `dist-tags.latest = 0.1.1`，`GET /dsh-artifact-wall/0.1.1` 200 且 `dist.shasum` 与本地 tgz 一致（`d597f99c…`）。
+- 2026-11-19：从 npm 重装验证。先 `remove_bundle`（清掉 junction），再 `install_bundle("dsh-artifact-wall@0.1.1")` → `{stage:"enable", application:"applied"}`；`node_modules/dsh-artifact-wall` 变为真实目录（7 个文件、非 junction），`Slots.listSubTree("conversation.chat.turnTail")` 中本插件仍为 `{order:60, active:true}`。

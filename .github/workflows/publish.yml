@@ -1,0 +1,33 @@
+name: publish
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      # Trusted Publishing: npm exchanges this workflow's OIDC token for a
+      # short-lived publish credential, so no NPM_TOKEN secret is needed.
+      # Configure the trusted publisher on npmjs.com first:
+      #   Package: dsh-artifact-wall
+      #   Publisher: GitHub Actions
+      #   Organization/User: HuangQinHao
+      #   Repository: dsh-artifact-wall
+      #   Workflow filename: publish.yml
+      #   Environment: (leave empty)
+      - name: Publish to npm
+        run: npm publish --provenance --access public
